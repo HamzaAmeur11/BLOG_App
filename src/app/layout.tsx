@@ -1,9 +1,11 @@
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Session } from "inspector/promises";
 import SessionWrapper from "../components/SessionWrapper";
 import Header from "@/components/Header";
+import Provider from "@/components/Provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,8 +23,10 @@ export default function RootLayout({
     <SessionWrapper>
       <html lang="en">
         <body className={inter.className}>
-          <Header />
-          {children}
+          <Provider>
+            <Header />
+            {children}
+          </Provider>
         </body>
       </html>
     </SessionWrapper>

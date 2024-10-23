@@ -1,5 +1,8 @@
 'use client'
 import { FormData } from "@/types/blog";
+import axios from "axios";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import ReactTextareaAutosize from "react-textarea-autosize";
 
@@ -8,6 +11,10 @@ const FormNewPost = () => {
     title: "",
     content: "",
   });
+  const router = useRouter();
+
+  const {data} = useSession();
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     e.preventDefault();
@@ -18,9 +25,19 @@ const FormNewPost = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     console.log('FORM SUBMIT ',form);
     e.preventDefault();
+    try{
+      const res = await axios.post('/api/posts',form);
+      if (res.status === 200) {
+        console.log("i/m here");
+        
+        router.push(`/blogs/${res.data.newPost.id}`);
+      }
+    }catch(error){
+      console.error('ERROR ',error);
+    }
     
   };
 

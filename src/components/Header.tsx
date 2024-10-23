@@ -1,7 +1,12 @@
+"use client";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import React from "react";
 
 const Header = () => {
+  const { data } = useSession();
+  console.log("session header", data);
+
   return (
     <header className="bg-blue-700 p-4">
       <nav className="flex justify-between items-center max-w-4xl mx-auto">
@@ -15,7 +20,21 @@ const Header = () => {
             </Link>
           </li>
           <li>
-            <Link href={"/api/auth/signin"} className="text-white hover:underline">Login</Link>
+            {data ? (
+              <Link
+                href={"/api/auth/signout"}
+                className="text-white hover:underline"
+              >
+                Logout
+              </Link>
+            ) : (
+              <Link
+                href={"/api/auth/signin"}
+                className="text-white hover:underline"
+              >
+                Login
+              </Link>
+            )}
           </li>
         </ul>
       </nav>

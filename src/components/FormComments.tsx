@@ -1,18 +1,43 @@
-'use client'
+import { Comment } from "@prisma/client";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import React, { FC, useState } from "react";
 
-import React, { useState } from "react";
+interface FromCommentsProps {
+  handleSubmit: (newComment: Comment) => void;
+  postId: string;
+}
 
-const FormComments = () => {
+
+const FormComments :FC<FromCommentsProps> = ({ handleSubmit, postId }) => {
   const [comment, setComment] = useState<string>("");
+  const router = useRouter();
+
+  const handleSubmitComment = async () => {
+    console.log("COMMENT SUBMITTED ", comment);
+    if (comment.trim() !== "") {
+        try {
+            const res = await axios.post("/api/comments", {
+                content: comment,
+                postId: postId
+            });
+            if (res.status === 200) {
+                // setComment("");
+                console.log("COMMENT ", res.data.newComment);
+                handleSubmit(res.data.newComment);
+                setComment("");
+            } else 
+                console.error("ERROR ", res.statusText);
+        } catch (error) {
+            console.error("ERROR ", error);
+        }
+    }
+};
 
   const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     setComment(e.target.value);
   };
-
-    const handleSubmitComment = () => {
-        console.log("COMMENT SUBMITTED ", comment);
-    };
 
   return (
     <div>

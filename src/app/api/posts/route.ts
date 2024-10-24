@@ -3,12 +3,12 @@ import { getCurrentUser } from "../../../../lib/getCurrentUser";
 import prisma from "../../../../lib/db";
 import { authOptions } from "../../../../lib/authOptions";
 import { getServerSession } from "next-auth";
-import { log } from "console";
+import { NextApiRequest, NextApiResponse } from "next";
 
 // POST: Create a new post
 export async function POST(req: Request) {
     const session = await getServerSession(authOptions);
-    log('POST SESSION :', session);
+    console.log('POST SESSION :', session);
 
     try {
         if (!session || !session.user?.email)
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
 // PUT: Update a post by ID
 export async function PUT(req: Request) {
     const session = await getServerSession(authOptions);
-    log('PUT SESSION :', session);
+    console.log('PUT SESSION :', session);
 
     try {
         if (!session || !session.user?.email)
@@ -48,21 +48,38 @@ export async function PUT(req: Request) {
 }
 
 // DELETE: Delete a post by ID
-export async function DELETE(req: Request) {
-    const session = await getServerSession(authOptions);
-    log('DELETE SESSION :', session);
+export async function DELETE(req: NextApiRequest, res: NextApiResponse) {
+    console.log('DELETE request received');
+    const session = await getServerSession(req, res, authOptions);
+    console.log('DELETE SESSION :', session);
 
     try {
-        if (!session || !session.user?.email)
-            return NextResponse.json({ error: "Not AUTH" }, { status: 401 });
+        if (!session || !session.user?.email) {
+            console.log('Not authenticated');
+            return res.status(401).json({ error: "Not AUTH" });
+        }
 
-        const { id } = await req.json();
-        await prisma.post.delete({
-            where: { id }
+        const { id } = req.query;
+        console.log('Post ID to delete:', id);
+
+        const post = await prisma.post.findUnique({
+            where: { id: String(id) },
         });
-        return NextResponse.json({ message: "Post deleted successfully" }, { status: 200 });
+
+        if (!post) {
+            console.log('Post not found');
+            return res.status(404).json({ error: 'Post not found' });
+        }
+
+        await prisma.post.delete({
+            where: { id: String(id) },
+        });
+
+        console.log('Post deleted successfully');
+        return res.status(200).json({ message: "Post deleted successfully" });
     } catch (error) {
-        return NextResponse.json({ error: "SOMETHING WENT WRONG?" }, { status: 500 });
+        console.error('Error deleting post:', error);
+        return res.status(500).json({ error: "SOMETHING WENT WRONG?" });
     }
 }
 

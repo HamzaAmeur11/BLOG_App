@@ -65,7 +65,8 @@ const FormNewPost = () => {
       </div>
       <button
         type="submit"
-        className="custom-button w-full">
+        disabled={data===null}
+        className=" custom-button bg-blue-500 w-full">
         Submit
         </button>
     </form>

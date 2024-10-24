@@ -55,7 +55,7 @@ const FormComments :FC<FromCommentsProps> = ({ handleSubmit, postId }) => {
           value={comment}
           onChange={handleCommentChange}
         />
-        <button onClick={handleSubmitComment} className="custom-button mt-4">Submit comment</button>
+        <button onClick={handleSubmitComment} className=" custom-button bg-blue-500 mt-4">Submit comment</button>
       </div>
     </div>
   );
